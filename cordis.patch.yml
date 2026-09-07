@@ -1,0 +1,5 @@
+# dsh-my-plugins bundle patch(dsh.bundle manifest 要求的加载配置)
+# 单包单插件：装一次，重启 dsh web 后「设置 → 插件」出现「我的插件」tab。
+- insert:
+    - id: my-plugins
+      name: dsh-my-plugins
