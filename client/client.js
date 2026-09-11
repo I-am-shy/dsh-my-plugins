@@ -30,6 +30,7 @@ function createMyPluginsTab(React) {
     const [plugins, setPlugins] = useState(null);
     const [error, setError] = useState("");
     const [notice, setNotice] = useState(null);
+    const [noticeLeaving, setNoticeLeaving] = useState(false);
     const [busy, setBusy] = useState({});
     const [modal, setModal] = useState(null);
     const pollTimer = useRef(null);
@@ -48,9 +49,15 @@ function createMyPluginsTab(React) {
     }, []);
     useEffect(() => {
       if (!notice) return void 0;
-      const timer = setTimeout(() => setNotice(null), notice.kind === "err" ? 8e3 : 4e3);
+      setNoticeLeaving(false);
+      const timer = setTimeout(() => setNoticeLeaving(true), notice.kind === "err" ? 8e3 : 4e3);
       return () => clearTimeout(timer);
     }, [notice]);
+    useEffect(() => {
+      if (!noticeLeaving) return void 0;
+      const gone = setTimeout(() => setNotice(null), 240);
+      return () => clearTimeout(gone);
+    }, [noticeLeaving]);
     useEffect(
       () => () => {
         if (pollTimer.current) clearInterval(pollTimer.current);
@@ -243,7 +250,30 @@ function createMyPluginsTab(React) {
           t("restart")
         )
       ),
-      notice ? h("p", { className: `mp-notice mp-${notice.kind}` }, notice.text) : null,
+      notice ? h(
+        "div",
+        { className: "mp-toastWrap" },
+        h(
+          "div",
+          {
+            className: `mp-toast mp-${notice.kind}${noticeLeaving ? " mp-out" : " mp-in"}`,
+            role: "status",
+            key: `${notice.kind}:${notice.text}`
+          },
+          h("span", { className: "mp-toastDot", "aria-hidden": "true" }),
+          h("span", { className: "mp-toastText" }, notice.text),
+          h(
+            "button",
+            {
+              className: "mp-toastClose",
+              type: "button",
+              "aria-label": t("close"),
+              onClick: () => setNoticeLeaving(true)
+            },
+            "\xD7"
+          )
+        )
+      ) : null,
       !restarted ? h("p", { className: "mp-hint" }, t("hint")) : null,
       body,
       modal ? h(
@@ -308,6 +338,7 @@ var zh = {
   uninstall: "\u5378\u8F7D",
   cancel: "\u53D6\u6D88",
   confirmOk: "\u786E\u5B9A",
+  close: "\u5173\u95ED",
   uninstallConfirm: "\u786E\u5B9A\u8981\u5378\u8F7D {pkg} \u5417\uFF1F\u5378\u8F7D\u540E\u9700\u91CD\u542F dsh web \u624D\u80FD\u5B8C\u5168\u751F\u6548\u3002",
   restartTimeout: "\u670D\u52A1\u5668 2 \u5206\u949F\u5185\u672A\u6062\u590D\uFF0C\u8BF7\u624B\u52A8\u5237\u65B0\u9875\u9762\u3002",
   enabledTag: "\u5DF2\u542F\u7528",
@@ -347,6 +378,7 @@ var en = {
   uninstall: "Uninstall",
   cancel: "Cancel",
   confirmOk: "Confirm",
+  close: "Close",
   uninstallConfirm: "Uninstall {pkg}? It takes full effect after restarting dsh web.",
   restartTimeout: "The server did not come back within 2 minutes. Please refresh manually.",
   enabledTag: "Enabled",
@@ -388,9 +420,19 @@ var CSS = [
   ".mp-btn.mp-danger:hover:not(:disabled){background:color-mix(in srgb, var(--dsw-alias-state-error-primary) 12%, transparent)}",
   ".mp-btn.mp-confirm{background:var(--dsw-alias-state-error-primary);border-color:var(--dsw-alias-state-error-primary);color:#fff}",
   ".mp-btn.mp-confirm:hover:not(:disabled){background:color-mix(in srgb, var(--dsw-alias-state-error-primary) 85%, #000)}",
-  ".mp-notice{margin:0 0 12px;padding:8px 12px;border-radius:8px;font-size:13px}",
-  ".mp-notice.mp-ok{background:color-mix(in srgb, var(--dsw-alias-state-success-primary) 10%, transparent);border:1px solid color-mix(in srgb, var(--dsw-alias-state-success-primary) 40%, transparent);color:var(--dsw-alias-label-secondary)}",
-  ".mp-notice.mp-err{background:color-mix(in srgb, var(--dsw-alias-state-error-primary) 10%, transparent);border:1px solid color-mix(in srgb, var(--dsw-alias-state-error-primary) 40%, transparent);color:var(--dsw-alias-state-error-primary)}",
+  // ---- toast notifications (floating, no layout impact) ----
+  ".mp-toastWrap{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:1100;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}",
+  ".mp-toast{pointer-events:auto;display:flex;align-items:center;gap:8px;max-width:min(560px,calc(100vw - 48px));padding:8px 10px 8px 12px;border-radius:10px;border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-3);color:var(--dsw-alias-label-secondary);font-size:13px;line-height:20px;box-shadow:var(--dsw-shadow-lv1)}",
+  ".mp-toast.mp-ok{border-color:color-mix(in srgb, var(--dsw-alias-state-success-primary) 40%, transparent)}",
+  ".mp-toast.mp-err{border-color:color-mix(in srgb, var(--dsw-alias-state-error-primary) 45%, transparent);color:var(--dsw-alias-state-error-primary)}",
+  ".mp-toastDot{flex:none;width:7px;height:7px;border-radius:999px;background:var(--dsw-alias-state-success-primary)}",
+  ".mp-toast.mp-err .mp-toastDot{background:var(--dsw-alias-state-error-primary)}",
+  ".mp-toastText{word-break:break-word}",
+  ".mp-toastClose{flex:none;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-left:2px;padding:0;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-tertiary);font-size:14px;line-height:1;cursor:pointer}",
+  ".mp-toastClose:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}",
+  "@media (prefers-reduced-motion:no-preference){.mp-toast.mp-in{animation:mp-toast-in .22s var(--ds-ease-in-out)}.mp-toast.mp-out{animation:mp-toast-out .2s var(--ds-ease-in-out) forwards}}",
+  "@keyframes mp-toast-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}",
+  "@keyframes mp-toast-out{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}",
   // ---- cards (same variables/structure as the official invlist) ----
   ".mp-cards{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:10px}",
   ".mp-card{border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-3);border-radius:10px;min-width:0;overflow:hidden}",

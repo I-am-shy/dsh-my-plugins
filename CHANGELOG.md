@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   plus a strict `tsc --noEmit` typecheck.
 - Reworked the repository into open-source standard layout: README, LICENSE,
   CHANGELOG, `.gitignore`, npm metadata (`repository`, `keywords`, scripts).
+- Replaced the inline notice paragraph with floating toast notifications:
+  enter/leave transitions, a manual close button, and no layout shift (the
+  toast is positioned out of the document flow).
 
 ### Fixed
 

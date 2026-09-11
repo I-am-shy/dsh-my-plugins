@@ -48,6 +48,7 @@ export function createMyPluginsTab(React: typeof ReactNS) {
     const [plugins, setPlugins] = useState<PluginListItem[] | null>(null); // null = loading
     const [error, setError] = useState("");
     const [notice, setNotice] = useState<Notice | null>(null);
+    const [noticeLeaving, setNoticeLeaving] = useState(false);
     const [busy, setBusy] = useState<Record<string, boolean>>({});
     const [modal, setModal] = useState<ModalState | null>(null);
     const pollTimer = useRef<any>(null);
@@ -70,12 +71,21 @@ export function createMyPluginsTab(React: typeof ReactNS) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Auto-dismiss notices: success after 4s, failure after 8s.
+    // Toast lifecycle: enter → hold (ok 4s / err 8s) → leave (~200ms fade) → unmount.
+    // The leaving phase plays the exit animation before the element is removed,
+    // so nothing pops in or out and the layout never shifts (position:fixed).
     useEffect(() => {
       if (!notice) return undefined;
-      const timer = setTimeout(() => setNotice(null), notice.kind === "err" ? 8000 : 4000);
+      setNoticeLeaving(false);
+      const timer = setTimeout(() => setNoticeLeaving(true), notice.kind === "err" ? 8000 : 4000);
       return () => clearTimeout(timer);
     }, [notice]);
+
+    useEffect(() => {
+      if (!noticeLeaving) return undefined;
+      const gone = setTimeout(() => setNotice(null), 240);
+      return () => clearTimeout(gone);
+    }, [noticeLeaving]);
 
     // Clear the restart poller when the component unmounts.
     useEffect(
@@ -300,7 +310,32 @@ export function createMyPluginsTab(React: typeof ReactNS) {
           t("restart"),
         ),
       ),
-      notice ? h("p", { className: `mp-notice mp-${notice.kind}` }, notice.text) : null,
+      notice
+        ? h(
+            "div",
+            { className: "mp-toastWrap" },
+            h(
+              "div",
+              {
+                className: `mp-toast mp-${notice.kind}${noticeLeaving ? " mp-out" : " mp-in"}`,
+                role: "status",
+                key: `${notice.kind}:${notice.text}`,
+              },
+              h("span", { className: "mp-toastDot", "aria-hidden": "true" }),
+              h("span", { className: "mp-toastText" }, notice.text),
+              h(
+                "button",
+                {
+                  className: "mp-toastClose",
+                  type: "button",
+                  "aria-label": t("close"),
+                  onClick: () => setNoticeLeaving(true),
+                },
+                "×",
+              ),
+            ),
+          )
+        : null,
       !restarted ? h("p", { className: "mp-hint" }, t("hint")) : null,
       body,
       modal
