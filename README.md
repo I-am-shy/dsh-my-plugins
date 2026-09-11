@@ -22,8 +22,10 @@
 
 "My Plugins" is a DSH plugin tab inside **Settings → Plugins**: view, enable, disable and uninstall *only the plugins you installed*. Built-in plugins are never listed or touched. Styling matches the official plugin inventory exactly (same theme variables), and follows light/dark mode automatically.
 
-<!-- 面板截图（可选，发布后可补充）：
-![我的插件面板](docs/images/panel.png) -->
+<div align="center">
+  <img src="docs/images/panel.png" alt="「我的插件」面板效果" width="720">
+  <p><em>「我的插件」面板 —— 设置 → 插件 → 我的插件</em></p>
+</div>
 
 ## 功能
 

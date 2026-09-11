@@ -28,6 +28,7 @@
     "lib",
     "client",
     "cordis.patch.yml",
+    "docs",
     "README.md",
     "LICENSE"
   ],
