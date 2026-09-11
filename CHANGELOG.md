@@ -17,7 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   CHANGELOG, `.gitignore`, npm metadata (`repository`, `keywords`, scripts).
 - Replaced the inline notice paragraph with floating toast notifications:
   enter/leave transitions, a manual close button, and no layout shift (the
-  toast is positioned out of the document flow).
+  toast is positioned out of the document flow). Kind-specific colors and
+  copy: green 已启用 (enabled), yellow 已关闭 (disabled), gray restarting
+  notice, red errors.
 
 ### Fixed
 

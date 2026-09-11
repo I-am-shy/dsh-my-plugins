@@ -27,7 +27,7 @@ const PHASE_TEXT: Record<string, string> = {
   unloading: "phaseUnloading",
 };
 
-type Notice = { kind: "ok" | "err"; text: string };
+type Notice = { kind: "ok" | "warn" | "info" | "err"; text: string };
 type ModalState = { kind: "restart" } | { kind: "uninstall"; pkg: string };
 
 /**
@@ -77,7 +77,10 @@ export function createMyPluginsTab(React: typeof ReactNS) {
     useEffect(() => {
       if (!notice) return undefined;
       setNoticeLeaving(false);
-      const timer = setTimeout(() => setNoticeLeaving(true), notice.kind === "err" ? 8000 : 4000);
+      const timer = setTimeout(
+        () => setNoticeLeaving(true),
+        notice.kind === "ok" || notice.kind === "warn" ? 4000 : 8000,
+      );
       return () => clearTimeout(timer);
     }, [notice]);
 
@@ -114,7 +117,11 @@ export function createMyPluginsTab(React: typeof ReactNS) {
       const enabled = !row.enabled;
       return withBusy(pkg, () =>
         api("/set-enabled", { pkg, enabled }).then(() => {
-          setNotice({ kind: "ok", text: t("opDone") });
+          // 结果文案与颜色一一对应：启用＝绿「已启用」，关闭＝黄「已关闭」
+          setNotice({
+            kind: enabled ? "ok" : "warn",
+            text: enabled ? t("enabledDone") : t("disabledDone"),
+          });
           refresh();
         }),
       );
@@ -138,7 +145,7 @@ export function createMyPluginsTab(React: typeof ReactNS) {
       withBusy("__restart__", () =>
         api("/restart", {}).then(() => {
           setRestarted(true);
-          setNotice({ kind: "ok", text: t("restarting") });
+          setNotice({ kind: "info", text: t("restarting") });
           let attempts = 0;
           let okStreak = 0;
           pollTimer.current = setInterval(() => {
@@ -275,9 +282,7 @@ export function createMyPluginsTab(React: typeof ReactNS) {
 
     // ---- body states ----
     let body: ReactNS.ReactElement;
-    if (restarted) {
-      body = h("p", { className: "mp-status" }, t("restarting"));
-    } else if (plugins === null) {
+    if (plugins === null) {
       body = h("p", { className: "mp-status" }, t("loading"));
     } else if (error) {
       body = h("p", { className: "mp-status" }, t("error"), " — ", error);
@@ -336,7 +341,7 @@ export function createMyPluginsTab(React: typeof ReactNS) {
             ),
           )
         : null,
-      !restarted ? h("p", { className: "mp-hint" }, t("hint")) : null,
+      h("p", { className: "mp-hint" }, t("hint")),
       body,
       modal
         ? h(

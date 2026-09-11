@@ -50,7 +50,10 @@ function createMyPluginsTab(React) {
     useEffect(() => {
       if (!notice) return void 0;
       setNoticeLeaving(false);
-      const timer = setTimeout(() => setNoticeLeaving(true), notice.kind === "err" ? 8e3 : 4e3);
+      const timer = setTimeout(
+        () => setNoticeLeaving(true),
+        notice.kind === "ok" || notice.kind === "warn" ? 4e3 : 8e3
+      );
       return () => clearTimeout(timer);
     }, [notice]);
     useEffect(() => {
@@ -80,7 +83,10 @@ function createMyPluginsTab(React) {
       return withBusy(
         pkg,
         () => api("/set-enabled", { pkg, enabled }).then(() => {
-          setNotice({ kind: "ok", text: t("opDone") });
+          setNotice({
+            kind: enabled ? "ok" : "warn",
+            text: enabled ? t("enabledDone") : t("disabledDone")
+          });
           refresh();
         })
       );
@@ -96,7 +102,7 @@ function createMyPluginsTab(React) {
       "__restart__",
       () => api("/restart", {}).then(() => {
         setRestarted(true);
-        setNotice({ kind: "ok", text: t("restarting") });
+        setNotice({ kind: "info", text: t("restarting") });
         let attempts = 0;
         let okStreak = 0;
         pollTimer.current = setInterval(() => {
@@ -216,9 +222,7 @@ function createMyPluginsTab(React) {
       );
     };
     let body;
-    if (restarted) {
-      body = h("p", { className: "mp-status" }, t("restarting"));
-    } else if (plugins === null) {
+    if (plugins === null) {
       body = h("p", { className: "mp-status" }, t("loading"));
     } else if (error) {
       body = h("p", { className: "mp-status" }, t("error"), " \u2014 ", error);
@@ -274,7 +278,7 @@ function createMyPluginsTab(React) {
           )
         )
       ) : null,
-      !restarted ? h("p", { className: "mp-hint" }, t("hint")) : null,
+      h("p", { className: "mp-hint" }, t("hint")),
       body,
       modal ? h(
         "div",
@@ -361,6 +365,8 @@ var zh = {
   entry: "\u6761\u76EE",
   patchPersisted: "\u5173\u95ED\u72B6\u6001\u5DF2\u6301\u4E45\u5316\uFF08\u91CD\u542F dsh web \u540E\u4ECD\u4FDD\u6301\u5173\u95ED\uFF09",
   opDone: "\u5DF2\u5B8C\u6210",
+  enabledDone: "\u5DF2\u542F\u7528",
+  disabledDone: "\u5DF2\u5173\u95ED",
   opFailed: "\u64CD\u4F5C\u5931\u8D25",
   removed: "\u5DF2\u5378\u8F7D {pkg}\uFF0C\u91CD\u542F dsh web \u540E\u5B8C\u5168\u751F\u6548\u3002",
   builtin: "\u5B98\u65B9\u81EA\u5E26\u63D2\u4EF6",
@@ -401,6 +407,8 @@ var en = {
   entry: "Entry",
   patchPersisted: "Disabled state persisted (stays disabled after dsh web restarts)",
   opDone: "Done",
+  enabledDone: "Enabled",
+  disabledDone: "Disabled",
   opFailed: "Operation failed",
   removed: "{pkg} uninstalled; takes full effect after restarting dsh web.",
   builtin: "Built-in plugins",
@@ -425,6 +433,10 @@ var CSS = [
   ".mp-toast{pointer-events:auto;display:flex;align-items:center;gap:8px;max-width:min(560px,calc(100vw - 48px));padding:8px 10px 8px 12px;border-radius:10px;border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-3);color:var(--dsw-alias-label-secondary);font-size:13px;line-height:20px;box-shadow:var(--dsw-shadow-lv1)}",
   ".mp-toast.mp-ok{border-color:color-mix(in srgb, var(--dsw-alias-state-success-primary) 40%, transparent)}",
   ".mp-toast.mp-err{border-color:color-mix(in srgb, var(--dsw-alias-state-error-primary) 45%, transparent);color:var(--dsw-alias-state-error-primary)}",
+  ".mp-toast.mp-warn{border-color:color-mix(in srgb, var(--dsw-alias-state-warning-primary, #d97706) 45%, transparent);color:var(--dsw-alias-state-warning-primary, #b45309)}",
+  ".mp-toast.mp-warn .mp-toastDot{background:var(--dsw-alias-state-warning-primary, #d97706)}",
+  ".mp-toast.mp-info{color:var(--dsw-alias-label-secondary)}",
+  ".mp-toast.mp-info .mp-toastDot{background:var(--dsw-alias-label-tertiary)}",
   ".mp-toastDot{flex:none;width:7px;height:7px;border-radius:999px;background:var(--dsw-alias-state-success-primary)}",
   ".mp-toast.mp-err .mp-toastDot{background:var(--dsw-alias-state-error-primary)}",
   ".mp-toastText{word-break:break-word}",
