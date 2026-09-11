@@ -70,7 +70,7 @@ function createMyPluginsTab(React) {
     const withBusy = (key, fn) => {
       setBusy((current) => ({ ...current, [key]: true }));
       return Promise.resolve().then(fn).catch((err) => {
-        setNotice({ kind: "err", text: `${t("opFailed")}\uFF1A${err?.message ?? err}` });
+        setNotice({ kind: "err", text: `${t("opFailed")}：${err?.message ?? err}` });
       }).finally(() => {
         setBusy((current) => ({ ...current, [key]: false }));
         setModal(null);
@@ -225,7 +225,7 @@ function createMyPluginsTab(React) {
     if (plugins === null) {
       body = h("p", { className: "mp-status" }, t("loading"));
     } else if (error) {
-      body = h("p", { className: "mp-status" }, t("error"), " \u2014 ", error);
+      body = h("p", { className: "mp-status" }, t("error"), " — ", error);
     } else if (!plugins.length) {
       body = h("p", { className: "mp-status" }, t("empty"));
     } else {
@@ -274,7 +274,7 @@ function createMyPluginsTab(React) {
               "aria-label": t("close"),
               onClick: () => setNoticeLeaving(true)
             },
-            "\xD7"
+            "×"
           )
         )
       ) : null,
@@ -292,7 +292,7 @@ function createMyPluginsTab(React) {
           h(
             "h3",
             { className: "mp-dialogTitle" },
-            modal.kind === "restart" ? t("restart") : `${t("uninstall")} \u2014 ${modal.pkg}`
+            modal.kind === "restart" ? t("restart") : `${t("uninstall")} — ${modal.pkg}`
           ),
           h(
             "p",
@@ -331,54 +331,54 @@ function createMyPluginsTab(React) {
 
 // src/client/locales.ts
 var zh = {
-  tab: "\u6211\u7684\u63D2\u4EF6",
-  hint: "\u8FD9\u91CC\u53EA\u663E\u793A\u4F60\u81EA\u5DF1\u5B89\u88C5\u7684\u63D2\u4EF6\uFF08\u6309 profile \u4F9D\u8D56\u8BC6\u522B\uFF09\uFF1B\u5B98\u65B9\u81EA\u5E26\u63D2\u4EF6\u4E0D\u5728\u6B64\u7BA1\u7406\u3002",
-  refresh: "\u5237\u65B0",
-  restart: "\u91CD\u542F dsh web",
-  confirmRestart: "\u786E\u5B9A\u8981\u91CD\u542F dsh web \u5417\uFF1F\u5F53\u524D\u9875\u9762\u8FDE\u63A5\u4F1A\u6682\u65F6\u65AD\u5F00\uFF0C\u91CD\u542F\u5B8C\u6210\u540E\u8BF7\u624B\u52A8\u5237\u65B0\u9875\u9762\u3002",
-  restarting: "\u6B63\u5728\u91CD\u542F\u2026\u2026\u670D\u52A1\u5668\u6062\u590D\u540E\u672C\u9875\u4F1A\u81EA\u52A8\u5237\u65B0\u3002",
-  enable: "\u542F\u7528",
-  disable: "\u5173\u95ED",
-  uninstall: "\u5378\u8F7D",
-  cancel: "\u53D6\u6D88",
-  confirmOk: "\u786E\u5B9A",
-  close: "\u5173\u95ED",
-  uninstallConfirm: "\u786E\u5B9A\u8981\u5378\u8F7D {pkg} \u5417\uFF1F\u5378\u8F7D\u540E\u9700\u91CD\u542F dsh web \u624D\u80FD\u5B8C\u5168\u751F\u6548\u3002",
-  restartTimeout: "\u670D\u52A1\u5668 2 \u5206\u949F\u5185\u672A\u6062\u590D\uFF0C\u8BF7\u624B\u52A8\u5237\u65B0\u9875\u9762\u3002",
-  enabledTag: "\u5DF2\u542F\u7528",
-  disabledTag: "\u5DF2\u505C\u7528",
-  configuration: "\u914D\u7F6E\u72B6\u6001",
-  cordis: "Cordis \u72B6\u6001",
-  persist: "\u6301\u4E45\u5316",
-  persistedYes: "\u5DF2\u5199\u5165\u8865\u4E01\u5C42\uFF0C\u91CD\u542F\u540E\u4FDD\u6301\u5173\u95ED",
-  phaseUnobserved: "\u672A\u6302\u8F7D",
-  phasePending: "\u7B49\u5F85\u4F9D\u8D56",
-  phaseLoading: "\u52A0\u8F7D\u4E2D",
-  phaseActive: "\u5DF2\u6302\u8F7D",
-  phaseFailed: "\u6302\u8F7D\u5931\u8D25",
-  phaseUnloading: "\u5378\u8F7D\u4E2D",
-  needsRestartTag: "\u5DF2\u5378\u8F7D\xB7\u9700\u91CD\u542F",
-  loading: "\u52A0\u8F7D\u4E2D\u2026",
-  empty: "\u4F60\u8FD8\u6CA1\u6709\u5B89\u88C5\u4EFB\u4F55\u63D2\u4EF6\u3002\u5B89\u88C5\u65B9\u5F0F\uFF1Adsh plugin --profile web add <\u5305\u540D>\u3002",
-  error: "\u52A0\u8F7D\u5931\u8D25",
-  version: "\u7248\u672C",
-  entry: "\u6761\u76EE",
-  patchPersisted: "\u5173\u95ED\u72B6\u6001\u5DF2\u6301\u4E45\u5316\uFF08\u91CD\u542F dsh web \u540E\u4ECD\u4FDD\u6301\u5173\u95ED\uFF09",
-  opDone: "\u5DF2\u5B8C\u6210",
-  enabledDone: "\u5DF2\u542F\u7528",
-  disabledDone: "\u5DF2\u5173\u95ED",
-  opFailed: "\u64CD\u4F5C\u5931\u8D25",
-  removed: "\u5DF2\u5378\u8F7D {pkg}\uFF0C\u91CD\u542F dsh web \u540E\u5B8C\u5168\u751F\u6548\u3002",
-  builtin: "\u5B98\u65B9\u81EA\u5E26\u63D2\u4EF6",
-  selfDisable: "\u9762\u677F\u81EA\u8EAB\u4E0D\u80FD\u5728\u8FD9\u91CC\u5173\u95ED\uFF08\u82E5\u8981\u505C\u7528\u8BF7\u5378\u8F7D\u6216\u76F4\u63A5\u7528\u547D\u4EE4\u884C\u7BA1\u7406\uFF09"
+  tab: "我的插件",
+  hint: "这里只显示你自己安装的插件（按 profile 依赖识别）；官方自带插件不在此管理。",
+  refresh: "刷新",
+  restart: "重启 dsh web",
+  confirmRestart: "确定要重启 dsh web 吗？当前页面连接会暂时断开，重启完成后本页面会自动刷新。",
+  restarting: "确定要重启 dsh web 吗？当前页面连接会暂时断开，重启完成后本页面会自动刷新。",
+  enable: "启用",
+  disable: "关闭",
+  uninstall: "卸载",
+  cancel: "取消",
+  confirmOk: "确定",
+  close: "关闭",
+  uninstallConfirm: "确定要卸载 {pkg} 吗？卸载后需重启 dsh web 才能完全生效。",
+  restartTimeout: "服务器 2 分钟内未恢复，请手动刷新页面。",
+  enabledTag: "已启用",
+  disabledTag: "已停用",
+  configuration: "配置状态",
+  cordis: "Cordis 状态",
+  persist: "持久化",
+  persistedYes: "已写入补丁层，重启后保持关闭",
+  phaseUnobserved: "未挂载",
+  phasePending: "等待依赖",
+  phaseLoading: "加载中",
+  phaseActive: "已挂载",
+  phaseFailed: "挂载失败",
+  phaseUnloading: "卸载中",
+  needsRestartTag: "已卸载·需重启",
+  loading: "加载中…",
+  empty: "你还没有安装任何插件。安装方式：dsh plugin --profile web add <包名>。",
+  error: "加载失败",
+  version: "版本",
+  entry: "条目",
+  patchPersisted: "关闭状态已持久化（重启 dsh web 后仍保持关闭）",
+  opDone: "已完成",
+  enabledDone: "已启用",
+  disabledDone: "已关闭",
+  opFailed: "操作失败",
+  removed: "已卸载 {pkg}，重启 dsh web 后完全生效。",
+  builtin: "官方自带插件",
+  selfDisable: "面板自身不能在这里关闭（若要停用请卸载或直接用命令行管理）"
 };
 var en = {
   tab: "My plugins",
   hint: "Only plugins you installed are listed here (detected from profile dependencies). Built-in bundles are not managed.",
   refresh: "Refresh",
   restart: "Restart dsh web",
-  confirmRestart: "Restart dsh web now? The page connection will drop; refresh the page once it is back.",
-  restarting: "Restarting\u2026 this page will reload automatically once the server is back.",
+  confirmRestart: "Restart dsh web now? The page connection will drop briefly; this page will reload automatically once the server is back.",
+  restarting: "Restart dsh web now? The page connection will drop briefly; this page will reload automatically once the server is back.",
   enable: "Enable",
   disable: "Disable",
   uninstall: "Uninstall",
@@ -399,8 +399,8 @@ var en = {
   phaseActive: "Mounted",
   phaseFailed: "Mount failed",
   phaseUnloading: "Unloading",
-  needsRestartTag: "Removed \xB7 restart needed",
-  loading: "Loading\u2026",
+  needsRestartTag: "Removed · restart needed",
+  loading: "Loading…",
   empty: "You have not installed any plugins yet. Install with: dsh plugin --profile web add <package>.",
   error: "Load failed",
   version: "Version",

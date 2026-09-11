@@ -26,6 +26,7 @@ const hostConfig = {
   format: "esm",
   target: ["node20"],
   minify: false,
+  charset: "utf8",
   banner,
   logLevel: "info",
 };
@@ -38,6 +39,7 @@ const clientConfig = {
   format: "cjs",
   target: ["es2020"],
   minify: false,
+  charset: "utf8",
   banner,
   external: ["react"],
   logLevel: "info",
